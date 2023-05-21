@@ -1,6 +1,6 @@
-#ifndef SCHEDULER
+#ifndef SCHEDULER_H
 
-#define SCHEDULER
+#define SCHEDULER_H
 
 #include <iostream>
 #include <thread>
@@ -13,19 +13,13 @@
 #include "Task.h"
 
 class Scheduler {
-public:
+   public:
     void add_task(Task* task);
-    ucontext_t* get_context();
-    Task* get_current_task();
 
-    void run();
+    Task* get_next_task();
 
-    void yield();
-
-private:
+   private:
     std::vector<Task*> tasks_;
-    Task* current_task_ = nullptr;
-    ucontext_t main_context_;
 };
 
-#endif  // !SCHEDULER
+#endif  // !SCHEDULER_H

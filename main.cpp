@@ -1,56 +1,61 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "Task.h"
-#include "Scheduler.h"
+#include "Kernel.h"
+#define STACK_SIZE 8192
 
-Scheduler scheduler;
+Kernel kernel;
 
-void task1_handler() {
-    Task* current_task = scheduler.get_current_task();
+void task1_handler(Task* task) {
     int count = 0;
     while (1) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(current_task->get_burst_time()));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         std::cout << "Task 1: " << count++ << std::endl;
-        scheduler.yield();
+        if (count == 2) {
+            task->set_completed(true);
+        }
+        kernel.yield();
     }
 }
 
-void task2_handler() {
-    Task* current_task = scheduler.get_current_task();
+void task2_handler(Task* task) {
     int count = 0;
-
     while (1) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(current_task->get_burst_time()));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         std::cout << "Task 2: " << count++ << std::endl;
-        scheduler.yield();
-
+        if (count == 3) {
+            task->set_completed(true);
+        }
+        kernel.yield();
     }
 }
 
-void task3_handler() {
-    Task* current_task = scheduler.get_current_task();
+void task3_handler(Task* task) {
     int count = 0;
-
-    for (int i = 0; i < 10; ++i) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(current_task->get_burst_time()));
+    while (1) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         std::cout << "Task 3: " << count++ << std::endl;
-        scheduler.yield();
+        if (count == 4) {
+            task->set_completed(true);
+        }
+        kernel.yield();
     }
 }
 
 
 int main(int argc, char *argv[])
 {
-    Task task1(1, 3, task1_handler, 1000);
-    Task task2(2, 2, task2_handler, 1000);
-    Task task3(3, 1, task3_handler, 1000);
+    Task task1(1, 3, task1_handler, 1000, STACK_SIZE);
+    Task task2(2, 2, task2_handler, 1000, STACK_SIZE);
+    Task task3(3, 1, task3_handler, 1000, STACK_SIZE);
 
-    scheduler.add_task(&task1);
-    scheduler.add_task(&task2);
-    scheduler.add_task(&task3);
+    kernel.add_task(&task1);
+    kernel.add_task(&task2);
+    kernel.add_task(&task3);
 
-    getcontext(scheduler.get_context());
-    scheduler.run();
+    getcontext(kernel.get_main_context());
+    kernel.run();
+
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
