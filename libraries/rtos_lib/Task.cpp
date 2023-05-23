@@ -1,0 +1,18 @@
+#include "Task.h"
+
+Task::Task(int id, int priority, void (*task_function)(Task*), int burst_time, size_t stack_size)
+    : task_function_(task_function), tcb_(id, priority, burst_time, stack_size) {
+    // Pass 'this' pointer as an argument to the static member function
+    makecontext(&tcb_.context, (void (*)(void)) & Task::task_entry_point, 1, this);
+}
+
+// Static member function to serve as the entry point
+void Task::task_entry_point(Task* task) {
+    task->task_function_(task);  // Call the actual task function
+}
+
+int Task::get_id() const { return tcb_.id; }
+int Task::get_priority() const { return tcb_.priority; }
+int Task::get_burst_time() const { return tcb_.burst_time; }
+ucontext_t* Task::get_context() { return &tcb_.context; }
+

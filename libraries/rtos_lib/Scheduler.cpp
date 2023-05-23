@@ -11,14 +11,8 @@ Task* Scheduler::get_next_task() {
         return nullptr;
     }
 
-    Task* next_task = nullptr;
-    do {
-        if (tasks_.empty()) {
-            return nullptr;
-        }
-        next_task = tasks_.front();
-        tasks_.erase(tasks_.begin());
-    } while (next_task->get_completed());
+    Task* next_task = tasks_.front();
+    tasks_.erase(tasks_.begin());
 
     tasks_.push_back(next_task);
     return next_task;

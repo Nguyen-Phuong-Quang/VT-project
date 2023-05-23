@@ -1,44 +1,52 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include "Task.h"
-#include "Kernel.h"
+#include "libraries/rtos_lib/RTOS.h"
 #define STACK_SIZE 8192
 
 Kernel kernel;
 
 void task1_handler(Task* task) {
-    int count = 0;
+    int count = 1;
     while (1) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "Task 1: " << count++ << std::endl;
-        if (count == 2) {
-            task->set_completed(true);
+        std::cout << "Task 1: " << count << " (" << 1000 << "ms)" << std::endl;
+
+        if (count == 8) {
+            kernel.yield();
         }
-        kernel.yield();
+        count++;
+
+        if (count > 10) count = 1;
     }
 }
 
 void task2_handler(Task* task) {
-    int count = 0;
+    int count = 20;
     while (1) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "Task 2: " << count++ << std::endl;
-        if (count == 3) {
-            task->set_completed(true);
+        std::cout << "Task 2: " << count << " (" << 1000 << "ms)" << std::endl;
+
+        if (count == 30) {
+            kernel.yield();
         }
-        kernel.yield();
+        count++;
+        if (count > 40)
+            count = 20;
     }
 }
 
 void task3_handler(Task* task) {
-    int count = 0;
+    int count = 100;
     while (1) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "Task 3: " << count++ << std::endl;
-        if (count == 4) {
-            task->set_completed(true);
+        std::cout << "Task 3: " << count << " (" << 1000 << "ms)" << std::endl;
+
+        if (count == 20) {
+            kernel.yield();
         }
-        kernel.yield();
+        count--;
+        if (count < 0)
+            count = 100;
     }
 }
 

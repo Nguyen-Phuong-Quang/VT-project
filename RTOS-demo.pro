@@ -14,10 +14,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        Kernel.cpp \
-        Scheduler.cpp \
-        Task.cpp \
-        main.cpp
+    libraries/rtos_lib/Kernel.cpp \
+    libraries/rtos_lib/Scheduler.cpp \
+    libraries/rtos_lib/Task.cpp \
+    libraries/rtos_lib/TaskControlBlock.cpp \
+        main.cpp \
 
 RESOURCES += qml.qrc
 
@@ -33,6 +34,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    Kernel.h \
-    Scheduler.h \
-    Task.h
+    libraries/rtos_lib/Kernel.h \
+    libraries/rtos_lib/RTOS.h \
+    libraries/rtos_lib/Scheduler.h \
+    libraries/rtos_lib/Task.h \
+    libraries/rtos_lib/TaskControlBlock.h
+

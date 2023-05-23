@@ -10,6 +10,8 @@
 #include <ucontext.h>
 #include <memory>
 
+#include "TaskControlBlock.h"
+
 #define STACK_SIZE 8192
 
 class Task {
@@ -21,20 +23,13 @@ class Task {
 
     int get_id() const;
     int get_priority() const;
-    int get_burst_time() const;
-    ucontext_t* get_context();
-    bool get_completed() const;
-    void set_completed(bool completed);
+    int get_burst_time() const ;
+    ucontext_t* get_context() ;
 
    private:
-    int id_;
-    int priority_;
-    int burst_time_;
-    ucontext_t context_;
-    std::vector<char> stack_;
-    size_t stack_size_;
+
     void (*task_function_)(Task*);
-    bool completed_ = false;
+    TaskControlBlock tcb_;
 };
 
 
