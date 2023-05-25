@@ -30,6 +30,7 @@ class Task {
     void set_task_state(TaskState state) ;
     ucontext_t* get_context();
 
+    void delay(int intervals);
 
    private:
     void (*task_function_)(Task*);

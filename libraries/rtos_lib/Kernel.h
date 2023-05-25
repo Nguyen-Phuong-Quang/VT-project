@@ -2,18 +2,11 @@
 #define KERNEL_H
 
 #include <ucontext.h>
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <memory>
-#include <thread>
-#include <vector>
-
 #include "Task.h"
 #include "Scheduler.h"
 
 class Kernel {
-   public:
+public:
     Kernel();
 
     void add_task(Task* task);
@@ -22,11 +15,9 @@ class Kernel {
 
     void run();
 
-    void yield();
+    void handle_time_slice();
 
-    void delay(int times);
-
-   private:
+private:
     Scheduler scheduler_;
     Task* current_task_ = nullptr;
     ucontext_t main_context_;

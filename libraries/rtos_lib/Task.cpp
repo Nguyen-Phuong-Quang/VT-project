@@ -20,4 +20,12 @@ void Task::set_task_state(TaskState state) {
 }
 ucontext_t* Task::get_context() { return &tcb_.context; }
 
+void Task::delay(int intervals) {
+    tcb_.state = TaskState::Suspended;
+    delay_time = intervals;
 
+    while (delay_time > 0) {
+    }
+
+    tcb_.state = TaskState::Ready;
+}
