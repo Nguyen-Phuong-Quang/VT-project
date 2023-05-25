@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <ucontext.h>
+#include "TaskState.h"
 
 struct TaskControlBlock {
     int id;
@@ -12,6 +13,7 @@ struct TaskControlBlock {
     std::vector<char> stack;
     size_t stack_size;
     ucontext_t context;
+    TaskState state;
     // Add any additional properties you need for task control and management
 
     TaskControlBlock(int id, int priority, int burst_time, size_t stack_size);

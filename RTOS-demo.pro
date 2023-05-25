@@ -38,5 +38,6 @@ HEADERS += \
     libraries/rtos_lib/RTOS.h \
     libraries/rtos_lib/Scheduler.h \
     libraries/rtos_lib/Task.h \
-    libraries/rtos_lib/TaskControlBlock.h
+    libraries/rtos_lib/TaskControlBlock.h \
+    libraries/rtos_lib/TaskState.h
 

@@ -3,13 +3,31 @@
 #include "libraries/rtos_lib/RTOS.h"
 #define STACK_SIZE 8192
 
+void print_time() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+    std::tm* now_tm = std::localtime(&now_c);
+
+    std::cout << (now_tm->tm_year + 1900) << ":";  // Năm
+    std::cout << (now_tm->tm_mon + 1) << ":";      // Tháng
+    std::cout << now_tm->tm_mday << " ";           // Ngày
+    std::cout << now_tm->tm_hour << ":";           // Giờ
+    std::cout << now_tm->tm_min << ":";            // Phút
+    std::cout << now_tm->tm_sec << ":";            // Giây
+
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    std::cout << ms.count() % 1000 << " ";  // Mili giây
+}
+
 Kernel kernel;
 
 void task1_handler(Task* task) {
     int count = 1;
     while (1) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "Task 1: " << count << " (" << 1000 << "ms)" << std::endl;
+        kernel.delay(1000);
+        print_time();
+        std::cout << "Task " << task->get_id()  << ": " << count << std::endl;
 
         if (count == 8) {
             kernel.yield();
@@ -23,8 +41,9 @@ void task1_handler(Task* task) {
 void task2_handler(Task* task) {
     int count = 20;
     while (1) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "Task 2: " << count << " (" << 1000 << "ms)" << std::endl;
+        kernel.delay(1000);
+        print_time();
+        std::cout << "Task " << task->get_id()  << ": " << count << std::endl;
 
         if (count == 30) {
             kernel.yield();
@@ -38,8 +57,9 @@ void task2_handler(Task* task) {
 void task3_handler(Task* task) {
     int count = 100;
     while (1) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        std::cout << "Task 3: " << count << " (" << 1000 << "ms)" << std::endl;
+        kernel.delay(1000);
+        print_time();
+        std::cout << "Task " << task->get_id()  << ": " << count << std::endl;
 
         if (count == 20) {
             kernel.yield();
@@ -60,7 +80,6 @@ int main(int argc, char *argv[])
     kernel.add_task(&task1);
     kernel.add_task(&task2);
     kernel.add_task(&task3);
-
     getcontext(kernel.get_main_context());
     kernel.run();
 

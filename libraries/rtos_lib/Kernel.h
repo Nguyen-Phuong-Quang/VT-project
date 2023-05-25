@@ -15,6 +15,7 @@
 class Kernel {
    public:
     Kernel();
+
     void add_task(Task* task);
 
     ucontext_t* get_main_context();
@@ -22,6 +23,8 @@ class Kernel {
     void run();
 
     void yield();
+
+    void delay(int times);
 
    private:
     Scheduler scheduler_;

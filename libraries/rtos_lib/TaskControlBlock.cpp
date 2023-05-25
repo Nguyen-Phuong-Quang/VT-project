@@ -6,4 +6,5 @@ TaskControlBlock::TaskControlBlock(int id, int priority, int burst_time, size_t 
 
     context.uc_stack.ss_sp = stack.data();
     context.uc_stack.ss_size = stack_size;
+    state = TaskState::Ready;
 };
