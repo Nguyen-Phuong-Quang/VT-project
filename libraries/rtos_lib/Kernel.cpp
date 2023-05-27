@@ -2,8 +2,19 @@
 #include<vector>
 #include<ucontext.h>
 
+#define QUANTUM 1000 // microseconds
+
+void task_default(Task* task) {
+    while (1) {
+    }
+}
+
+Task default_t(0, 0, task_default, 1000, STACK_SIZE);
+
 Kernel::Kernel() {
     getcontext(&main_context_);
+    default_t.set_task_state(TaskState::Running);
+    scheduler_.add_runnning_task(&default_t);
 }
 
 void Kernel::add_task(Task* task) { scheduler_.add_task(task); }
@@ -11,6 +22,19 @@ void Kernel::add_task(Task* task) { scheduler_.add_task(task); }
 ucontext_t* Kernel::get_main_context() { return &main_context_; }
 
 void Kernel::run() {
+    scheduler_.get_tasks().front()->set_task_state(TaskState::Running);
+
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGALRM, &sa, nullptr);
+
+    // Set the timer to interrupt every 1ms (1000 microseconds)
+    timer.it_value.tv_sec = 0;
+    timer.it_value.tv_usec = QUANTUM;
+    timer.it_interval.tv_sec = 0;
+    timer.it_interval.tv_usec = QUANTUM;
+    setitimer(ITIMER_REAL, &timer, nullptr);
+
     while (1) {
         Task* next_task = scheduler_.get_next_task();
 
@@ -23,13 +47,34 @@ void Kernel::run() {
     }
 }
 
+void Kernel::yield() {
+    scheduler_.switch_task();
+}
+
 void Kernel::handle_time_slice() {
     std::vector<Task*> tasks = scheduler_.get_tasks();
 
-    for (std::vector<Task*>::iterator t = tasks.begin(); t < tasks.end(); ++t)
-        if ((*t)->delay_time > 0)
-            (*t)->delay_time--;
+    // Check task delay time and add task is running to running task of scheduler
+    for (Task* task : tasks) {
+        if (task->delay_time > 0) {
+            task->delay_time--;
+            if (task->delay_time == 0) {
+                task->resume();  // Resume the task if delay is completed
+            }
+        }
+    }
+
+    scheduler_.filter_task();
+
+    for (Task* task : tasks) {
+        if (task->get_task_state() == TaskState::Running) {
+            // std::cout << task->get_id() << '\n';
+            scheduler_.add_runnning_task(task);
+        }
+    }
+
     Task* current_task = current_task_;
     current_task_ = nullptr;
     swapcontext(current_task->get_context(), &main_context_);
 }
+

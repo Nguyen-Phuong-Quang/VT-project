@@ -1,12 +1,17 @@
 #ifndef KERNEL_H
 #define KERNEL_H
-
+#include <iomanip>
+#include <signal.h>
+#include <sys/time.h>
 #include <ucontext.h>
 #include "Task.h"
 #include "Scheduler.h"
 
 class Kernel {
-public:
+   public:
+    struct sigaction sa;
+    struct itimerval timer;
+
     Kernel();
 
     void add_task(Task* task);
@@ -15,9 +20,11 @@ public:
 
     void run();
 
+    void yield();
+
     void handle_time_slice();
 
-private:
+   private:
     Scheduler scheduler_;
     Task* current_task_ = nullptr;
     ucontext_t main_context_;

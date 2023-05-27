@@ -12,7 +12,7 @@
 #include "libraries/rtos_lib/RTOS.h"
 
 #define STACK_SIZE 8192
-#define QUANTUM 1000 // microseconds
+
 void print_time() {
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
@@ -39,9 +39,9 @@ void task1_handler(Task* task) {
         print_time();
         std::cout << "Task 1: " << count << std::endl;
 
-        // if (count == 8) {
-        //     kernel.yield();
-        // }
+        if (count == 8) {
+            kernel.yield();
+        }
         count++;
 
         if (count > 10) count = 1;
@@ -55,9 +55,9 @@ void task2_handler(Task* task) {
         print_time();
         std::cout << "Task 2: " << count << std::endl;
 
-        // if (count == 30) {
-        //     kernel.yield();
-        // }
+        if (count == 30) {
+            kernel.yield();
+        }
         count++;
         if (count > 40) count = 20;
     }
@@ -70,16 +70,17 @@ void task3_handler(Task* task) {
         print_time();
         std::cout << "Task 3: " << count << std::endl;
 
-        // if (count == 20) {
-        //     kernel.yield();
-        // }
+        if (count == 90) {
+            kernel.yield();
+        }
         count--;
         if (count < 0) count = 100;
     }
 }
 
 void timer_interrupt_handler(int signal) {
-    kernel.handle_time_slice();
+    if (signal == SIGALRM)
+        kernel.handle_time_slice();
 }
 
 
@@ -89,26 +90,14 @@ int main(int argc, char *argv[])
     Task task2(2, 2, task2_handler, 1000, STACK_SIZE);
     Task task3(3, 1, task3_handler, 1000, STACK_SIZE);
 
+    // task1.set_task_state(TaskState::Running);
     kernel.add_task(&task1);
     kernel.add_task(&task2);
     kernel.add_task(&task3);
 
     getcontext(kernel.get_main_context());
 
-    // Set up the timer interrupt handler
-    struct sigaction sa;
-    struct itimerval timer;
-    sa.sa_handler = timer_interrupt_handler;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGALRM, &sa, nullptr);
-
-    // Set the timer to interrupt every 1ms (1000 microseconds)
-    timer.it_value.tv_sec = 0;
-    timer.it_value.tv_usec = QUANTUM;
-    timer.it_interval.tv_sec = 0;
-    timer.it_interval.tv_usec = QUANTUM;
-    setitimer(ITIMER_REAL, &timer, nullptr);
+    kernel.sa.sa_handler = timer_interrupt_handler;
 
     kernel.run();
 
