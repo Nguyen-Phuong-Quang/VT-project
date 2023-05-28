@@ -90,7 +90,8 @@ int main(int argc, char *argv[])
     Task task2(2, 2, task2_handler, 1000, STACK_SIZE);
     Task task3(3, 1, task3_handler, 1000, STACK_SIZE);
 
-    // task1.set_task_state(TaskState::Running);
+    // Let task 1 run first
+    task1.set_task_state(TaskState::Running);
     kernel.add_task(&task1);
     kernel.add_task(&task2);
     kernel.add_task(&task3);

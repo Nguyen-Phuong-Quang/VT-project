@@ -14,7 +14,7 @@ Task default_t(0, 0, task_default, 1000, STACK_SIZE);
 Kernel::Kernel() {
     getcontext(&main_context_);
     default_t.set_task_state(TaskState::Running);
-    scheduler_.add_runnning_task(&default_t);
+    scheduler_.add_task(&default_t);
 }
 
 void Kernel::add_task(Task* task) { scheduler_.add_task(task); }
@@ -22,7 +22,6 @@ void Kernel::add_task(Task* task) { scheduler_.add_task(task); }
 ucontext_t* Kernel::get_main_context() { return &main_context_; }
 
 void Kernel::run() {
-    scheduler_.get_tasks().front()->set_task_state(TaskState::Running);
 
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
@@ -35,15 +34,11 @@ void Kernel::run() {
     timer.it_interval.tv_usec = QUANTUM;
     setitimer(ITIMER_REAL, &timer, nullptr);
 
-    while (1) {
-        Task* next_task = scheduler_.get_next_task();
+    Task* next_task = scheduler_.get_next_task();
 
-        if (next_task) {
-            current_task_ = next_task;
-            swapcontext(&main_context_, next_task->get_context());
-        } else {
-            break;
-        }
+    if (next_task) {
+        current_task_ = next_task;
+        swapcontext(&main_context_, next_task->get_context());
     }
 }
 
@@ -64,17 +59,12 @@ void Kernel::handle_time_slice() {
         }
     }
 
-    scheduler_.filter_task();
+    Task* next_task = scheduler_.get_next_task();
 
-    for (Task* task : tasks) {
-        if (task->get_task_state() == TaskState::Running) {
-            // std::cout << task->get_id() << '\n';
-            scheduler_.add_runnning_task(task);
-        }
+    if (next_task) {
+        Task* current_task = current_task_;
+        current_task_ = next_task;
+        swapcontext(current_task->get_context(), next_task->get_context());
     }
-
-    Task* current_task = current_task_;
-    current_task_ = nullptr;
-    swapcontext(current_task->get_context(), &main_context_);
 }
 
