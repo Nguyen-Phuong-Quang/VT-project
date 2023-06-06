@@ -1,33 +1,20 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <signal.h>
-#include <sys/time.h>
-#include <ucontext.h>
-#include <iomanip>
-#include <algorithm>
 #include <iostream>
-#include <memory>
-#include <thread>
-#include <vector>
-#include "libraries/rtos_lib/RTOS.h"
-
-#define STACK_SIZE 8192
+#include "RTOS/index.h"
 
 void print_time() {
     auto now = std::chrono::system_clock::now();
     std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-
     std::tm* now_tm = std::localtime(&now_c);
 
-    std::cout << (now_tm->tm_year + 1900) << ":";  // Năm
-    std::cout << (now_tm->tm_mon + 1) << ":";      // Tháng
-    std::cout << now_tm->tm_mday << " ";           // Ngày
-    std::cout << now_tm->tm_hour << ":";           // Giờ
-    std::cout << now_tm->tm_min << ":";            // Phút
-    std::cout << now_tm->tm_sec << ":";            // Giây
+    std::cout << (now_tm->tm_year + 1900) << "/";                                   // Year
+    std::cout << std::setfill('0') << std::setw(2) << (now_tm->tm_mon + 1) << "/";  // Month
+    std::cout << std::setfill('0') << std::setw(2) << now_tm->tm_mday << " ";       // Day
+    std::cout << std::setfill('0') << std::setw(2) << now_tm->tm_hour << ":";       // Hour
+    std::cout << std::setfill('0') << std::setw(2) << now_tm->tm_min << ":";        // Minute
+    std::cout << std::setfill('0') << std::setw(2) << now_tm->tm_sec << ":";        // Second
 
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    std::cout << ms.count() % 1000 << " ";  // Mili giây
+    std::cout << std::setfill('0') << std::setw(3) << ms.count() % 1000 << " ";  // Milliseconds
 }
 
 Kernel kernel;
@@ -36,9 +23,9 @@ void task1_handler(Task* task) {
     int count = 1;
     while (1) {
         task->delay(1000);
+
         print_time();
         std::cout << "Task 1: " << count << std::endl;
-
         if (count == 8) {
             kernel.yield();
         }
@@ -52,6 +39,7 @@ void task2_handler(Task* task) {
     int count = 20;
     while (1) {
         task->delay(1000);
+
         print_time();
         std::cout << "Task 2: " << count << std::endl;
 
@@ -66,11 +54,12 @@ void task2_handler(Task* task) {
 void task3_handler(Task* task) {
     int count = 100;
     while (1) {
-        task->delay(1000);
+        task->delay(500);
+
         print_time();
         std::cout << "Task 3: " << count << std::endl;
 
-        if (count == 90) {
+        if (count == 20) {
             kernel.yield();
         }
         count--;
@@ -83,15 +72,15 @@ void timer_interrupt_handler(int signal) {
         kernel.handle_time_slice();
 }
 
-
-int main(int argc, char *argv[])
-{
+int main() {
+    // Initial task with id, priority, function_handler, burst time, stack size
     Task task1(1, 3, task1_handler, 1000, STACK_SIZE);
     Task task2(2, 2, task2_handler, 1000, STACK_SIZE);
-    Task task3(3, 1, task3_handler, 1000, STACK_SIZE);
+    Task task3(3, 3, task3_handler, 1000, STACK_SIZE);
 
-    // Let task 1 run first
     task1.set_task_state(TaskState::Running);
+    // task2.set_task_state(TaskState::Running);
+    // task3.set_task_state(TaskState::Running);
     kernel.add_task(&task1);
     kernel.add_task(&task2);
     kernel.add_task(&task3);
@@ -102,19 +91,5 @@ int main(int argc, char *argv[])
 
     kernel.run();
 
-
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-    QGuiApplication app(argc, argv);
-
-    QQmlApplicationEngine engine;
-    const QUrl url(QStringLiteral("qrc:/main.qml"));
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
-
-    //    return app.exec();
+    return 0;
 }

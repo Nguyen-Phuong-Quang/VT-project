@@ -1,4 +1,5 @@
 #ifndef TASKSTATE_H
+
 #define TASKSTATE_H
 
 enum class TaskState {
@@ -8,4 +9,4 @@ enum class TaskState {
     Suspended
 };
 
-#endif // TASKSTATE_H
+#endif  // !TASKSTATE_H

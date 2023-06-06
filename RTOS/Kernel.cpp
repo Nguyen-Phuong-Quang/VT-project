@@ -1,8 +1,4 @@
 #include "Kernel.h"
-#include<vector>
-#include<ucontext.h>
-
-#define QUANTUM 1000 // microseconds
 
 void task_default(Task* task) {
     while (1) {
@@ -22,7 +18,6 @@ void Kernel::add_task(Task* task) { scheduler_.add_task(task); }
 ucontext_t* Kernel::get_main_context() { return &main_context_; }
 
 void Kernel::run() {
-
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sigaction(SIGALRM, &sa, nullptr);
@@ -51,9 +46,9 @@ void Kernel::handle_time_slice() {
 
     // Check task delay time and add task is running to running task of scheduler
     for (Task* task : tasks) {
-        if (task->delay_time > 0) {
-            task->delay_time--;
-            if (task->delay_time == 0) {
+        if (task->get_delay_time() > 0) {
+            task->decrease_delay_time();
+            if (task->get_delay_time() == 0) {
                 task->resume();  // Resume the task if delay is completed
             }
         }
@@ -67,4 +62,3 @@ void Kernel::handle_time_slice() {
         swapcontext(current_task->get_context(), next_task->get_context());
     }
 }
-

@@ -1,6 +1,7 @@
 #include "TaskControlBlock.h"
 
-TaskControlBlock::TaskControlBlock(int id, int priority, int burst_time, size_t stack_size) : id(id), priority(priority), burst_time(burst_time), stack_size(stack_size) {
+TaskControlBlock::TaskControlBlock(int id, int priority, int burst_time, size_t stack_size)
+    : id(id), priority(priority), burst_time(burst_time), stack_size(stack_size) {
     stack.resize(stack_size);
     getcontext(&context);
 

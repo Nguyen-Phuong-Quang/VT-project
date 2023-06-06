@@ -1,7 +1,4 @@
 #include "Scheduler.h"
-#include "Task.h"
-#include "TaskState.h"
-
 void Scheduler::add_task(Task* task) { tasks_.push_back(task); }
 
 std::vector<Task*> Scheduler::get_tasks() {
@@ -14,14 +11,15 @@ Task* Scheduler::get_next_task() {
     }
 
     Task* next_task = nullptr;
+    int highest_priority = -1;
 
-    while (1) {
-        current_task_index = (current_task_index + 1) % tasks_.size();
-        next_task = tasks_[current_task_index];
-
-        if (next_task->get_task_state() == TaskState::Running)
-            break;
+    for (Task* task : tasks_) {
+        if (task->get_task_state() == TaskState::Running && task->get_priority() > highest_priority) {
+            highest_priority = task->get_priority();
+            next_task = task;
+        }
     }
+
     return next_task;
 }
 

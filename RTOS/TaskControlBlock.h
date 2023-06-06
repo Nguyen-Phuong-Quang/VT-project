@@ -1,9 +1,11 @@
-#ifndef TASKCONTROLBLOCK_H
-#define TASKCONTROLBLOCK_H
+#ifndef TaskControlBlock_H
 
-#include <iostream>
-#include <vector>
+#define TaskControlBlock_H
+
 #include <ucontext.h>
+
+#include <vector>
+
 #include "TaskState.h"
 
 struct TaskControlBlock {
@@ -14,9 +16,8 @@ struct TaskControlBlock {
     size_t stack_size;
     ucontext_t context;
     TaskState state;
-    // Add any additional properties you need for task control and management
 
     TaskControlBlock(int id, int priority, int burst_time, size_t stack_size);
 };
 
-#endif // TASKCONTROLBLOCK_H
+#endif // !TaskControlBlock_H

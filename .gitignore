@@ -1,0 +1,3 @@
+# Ignore object file and execute file
+*.o
+main

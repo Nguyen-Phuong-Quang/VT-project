@@ -1,11 +1,13 @@
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifndef Scheduler_H
+
+#define Scheduler_H
 
 #include <vector>
+
 #include "Task.h"
 
 class Scheduler {
-public:
+   public:
     void add_task(Task* task);
 
     std::vector<Task*> get_tasks();
@@ -14,9 +16,8 @@ public:
 
     void switch_task();
 
-private:
+   private:
     std::vector<Task*> tasks_;
-    int current_task_index = -1;
 };
 
-#endif  // !SCHEDULER_H
+#endif  // !Scheduler_H

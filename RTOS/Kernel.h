@@ -1,11 +1,17 @@
-#ifndef KERNEL_H
-#define KERNEL_H
-#include <iomanip>
+#ifndef Kernel_H
+
+#define Kernel_H
+
 #include <signal.h>
 #include <sys/time.h>
 #include <ucontext.h>
-#include "Task.h"
+
+#include <cstdint>
+#include <iomanip>
+
 #include "Scheduler.h"
+#include "Task.h"
+#include "constants.h"
 
 class Kernel {
    public:
@@ -30,4 +36,4 @@ class Kernel {
     ucontext_t main_context_;
 };
 
-#endif // KERNEL_H
+#endif  // !Kernel_H
