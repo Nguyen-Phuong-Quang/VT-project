@@ -15,9 +15,6 @@
 
 class Kernel {
    public:
-    struct sigaction sa;
-    struct itimerval timer;
-
     Kernel();
 
     void add_task(Task* task);
@@ -30,10 +27,15 @@ class Kernel {
 
     void handle_time_slice();
 
+    static void timer_interrupt_handler(int signal);
+
    private:
     Scheduler scheduler_;
     Task* current_task_ = nullptr;
     ucontext_t main_context_;
+    struct sigaction sa;
+    struct itimerval timer;
+    static Kernel* kernel_instance_;
 };
 
 #endif  // !Kernel_H

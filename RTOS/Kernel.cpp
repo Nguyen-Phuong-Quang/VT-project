@@ -1,6 +1,7 @@
 #include "Kernel.h"
 
 void task_default(Task* task) {
+    task->get_id();
     while (1) {
     }
 }
@@ -8,6 +9,7 @@ void task_default(Task* task) {
 Task default_t(0, 0, task_default, 1000, STACK_SIZE);
 
 Kernel::Kernel() {
+    kernel_instance_ = this;
     getcontext(&main_context_);
     default_t.set_task_state(TaskState::Running);
     scheduler_.add_task(&default_t);
@@ -18,6 +20,7 @@ void Kernel::add_task(Task* task) { scheduler_.add_task(task); }
 ucontext_t* Kernel::get_main_context() { return &main_context_; }
 
 void Kernel::run() {
+    sa.sa_handler = timer_interrupt_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sigaction(SIGALRM, &sa, nullptr);
@@ -62,3 +65,11 @@ void Kernel::handle_time_slice() {
         swapcontext(current_task->get_context(), next_task->get_context());
     }
 }
+
+void Kernel::timer_interrupt_handler(int signal) {
+    if (signal == SIGALRM) {
+        kernel_instance_->handle_time_slice();
+    }
+}
+
+Kernel* Kernel::kernel_instance_ = nullptr;

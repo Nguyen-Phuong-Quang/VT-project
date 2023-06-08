@@ -38,7 +38,7 @@ void task1_handler(Task* task) {
 void task2_handler(Task* task) {
     int count = 20;
     while (1) {
-        task->delay(1000);
+        task->delay(500);
 
         print_time();
         std::cout << "Task 2: " << count << std::endl;
@@ -54,7 +54,7 @@ void task2_handler(Task* task) {
 void task3_handler(Task* task) {
     int count = 100;
     while (1) {
-        task->delay(500);
+        task->delay(250);
 
         print_time();
         std::cout << "Task 3: " << count << std::endl;
@@ -67,10 +67,10 @@ void task3_handler(Task* task) {
     }
 }
 
-void timer_interrupt_handler(int signal) {
-    if (signal == SIGALRM)
-        kernel.handle_time_slice();
-}
+// void timer_interrupt_handler(int signal) {
+//     if (signal == SIGALRM)
+//         kernel.handle_time_slice();
+// }
 
 int main() {
     // Initial task with id, priority, function_handler, burst time, stack size
@@ -87,7 +87,7 @@ int main() {
 
     getcontext(kernel.get_main_context());
 
-    kernel.sa.sa_handler = timer_interrupt_handler;
+    // kernel.sa.sa_handler = timer_interrupt_handler;
 
     kernel.run();
 
