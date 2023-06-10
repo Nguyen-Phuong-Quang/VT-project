@@ -7,5 +7,6 @@
 #include "Task.h"
 #include "Scheduler.h"
 #include "Kernel.h"
+#include "Semaphore.h"
 
 #endif // !index_H

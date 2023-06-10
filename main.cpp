@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "RTOS/index.h"
 
 void print_time() {
@@ -18,14 +19,18 @@ void print_time() {
 }
 
 Kernel kernel;
+Semaphore semaphore(1);
 
 void task1_handler(Task* task) {
     int count = 1;
     while (1) {
         task->delay(1000);
 
+        semaphore.acquire();
         print_time();
         std::cout << "Task 1: " << count << std::endl;
+        semaphore.release();
+
         if (count == 8) {
             kernel.yield();
         }
@@ -40,8 +45,10 @@ void task2_handler(Task* task) {
     while (1) {
         task->delay(500);
 
+        semaphore.acquire();
         print_time();
         std::cout << "Task 2: " << count << std::endl;
+        semaphore.release();
 
         if (count == 30) {
             kernel.yield();
@@ -56,8 +63,10 @@ void task3_handler(Task* task) {
     while (1) {
         task->delay(250);
 
+        semaphore.acquire();
         print_time();
         std::cout << "Task 3: " << count << std::endl;
+        semaphore.release();
 
         if (count == 20) {
             kernel.yield();
@@ -67,10 +76,7 @@ void task3_handler(Task* task) {
     }
 }
 
-// void timer_interrupt_handler(int signal) {
-//     if (signal == SIGALRM)
-//         kernel.handle_time_slice();
-// }
+
 
 int main() {
     // Initial task with id, priority, function_handler, burst time, stack size
@@ -79,15 +85,13 @@ int main() {
     Task task3(3, 3, task3_handler, 1000, STACK_SIZE);
 
     task1.set_task_state(TaskState::Running);
-    // task2.set_task_state(TaskState::Running);
-    // task3.set_task_state(TaskState::Running);
+    task2.set_task_state(TaskState::Running);
+    task3.set_task_state(TaskState::Running);
     kernel.add_task(&task1);
     kernel.add_task(&task2);
     kernel.add_task(&task3);
 
     getcontext(kernel.get_main_context());
-
-    // kernel.sa.sa_handler = timer_interrupt_handler;
 
     kernel.run();
 
