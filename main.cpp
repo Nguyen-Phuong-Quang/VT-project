@@ -85,8 +85,8 @@ int main() {
     Task task3(3, 3, task3_handler, 1000, STACK_SIZE);
 
     task1.set_task_state(TaskState::Running);
-    task2.set_task_state(TaskState::Running);
-    task3.set_task_state(TaskState::Running);
+    // task2.set_task_state(TaskState::Running);
+    // task3.set_task_state(TaskState::Running);
     kernel.add_task(&task1);
     kernel.add_task(&task2);
     kernel.add_task(&task3);

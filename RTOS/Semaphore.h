@@ -14,8 +14,8 @@ class Semaphore {
 
    private:
     int count_;
-    std::mutex mutex;            // Mutex to synchronize access to shared resources
-    std::condition_variable cv;  
+    std::mutex mutex_;            // Mutex to synchronize access to shared resources
+    std::condition_variable cv_;  
 };
 
 
